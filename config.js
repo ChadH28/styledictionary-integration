@@ -12,7 +12,6 @@ module.exports = {
       ],
     },
     json: {
-      // transformGroup: "json",
       buildPath: "styles/",
       files: [
         {
