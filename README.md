@@ -22,15 +22,17 @@ npm install style-dictionary tailwindcss postcss autoprefixer --save-dev
 
 ## Create Design Tokens with Style Dictionary
 
-Create a tokens directory and define your design tokens in JSON files. For example, tokens/color/base.json:
+Create a tokens directory and define your design tokens in JSON files. For example, tokens/color.json:
 
 ```json
 {
-  "color": {
-    "base": {
-      "red": { "value": "#ff0000" },
-      "green": { "value": "#00ff00" },
-      "blue": { "value": "#0000ff" }
+  "colors": {
+    "$type": "color",
+    "black": {
+      "$value": "#000000"
+    },
+    "white": {
+      "$value": "#ffffff"
     }
   }
 }
@@ -38,27 +40,14 @@ Create a tokens directory and define your design tokens in JSON files. For examp
 
 ## Configure Style Dictionary
 
-Create a style-dictionary.config.js file at the root of your project:
+Create a config.js file at the root of your project:
 
 ```javascript
-const StyleDictionary = require("style-dictionary");
-
-StyleDictionary.registerTransform({
-  name: "size/px",
-  type: "value",
-  matcher: function (prop) {
-    return prop.attributes.category === "size";
-  },
-  transformer: function (prop) {
-    return parseFloat(prop.original.value) + "px";
-  },
-});
-
 module.exports = {
   source: ["tokens/**/*.json"],
   platforms: {
     js: {
-      transforms: ["attribute/cti", "name/cti/constant"],
+      transformGroup: "js",
       buildPath: "styles/",
       files: [
         {
@@ -68,12 +57,21 @@ module.exports = {
       ],
     },
     json: {
-      transforms: ["attribute/cti", "name/cti/kebab", "size/px", "color/css"],
       buildPath: "styles/",
       files: [
         {
           destination: "tokens.json",
           format: "json/nested",
+        },
+      ],
+    },
+    scss: {
+      transformGroup: "scss",
+      buildPath: "styles/",
+      files: [
+        {
+          destination: "scss/_variables.scss",
+          format: "scss/variables",
         },
       ],
     },
@@ -86,6 +84,16 @@ Run the Style Dictionary build command to generate the tokens.js and tokens.json
 ```bash
     npx style-dictionary build
 ```
+
+Your output will be a styles folder with js and json files and a sass variables folder.
+
+## Pull token styles in tailwind.config.ts
+
+```javascript
+import * as tokens from "./styles/tokens.json";
+```
+Once this is brought in you will then add your json output to match up to whichever tailwind theme layout you will want to ouput.
+
 
 ## Deploy on Vercel
 
