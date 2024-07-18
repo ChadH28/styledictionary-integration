@@ -1,5 +1,3 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
 First, run the development server:
@@ -14,20 +12,80 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## Install Dependencies
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install style-dictionary tailwindcss postcss autoprefixer --save-dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Create Design Tokens with Style Dictionary
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Create a tokens directory and define your design tokens in JSON files. For example, tokens/color/base.json:
+
+```json
+{
+  "color": {
+    "base": {
+      "red": { "value": "#ff0000" },
+      "green": { "value": "#00ff00" },
+      "blue": { "value": "#0000ff" }
+    }
+  }
+}
+```
+
+## Configure Style Dictionary
+
+Create a style-dictionary.config.js file at the root of your project:
+
+```javascript
+const StyleDictionary = require("style-dictionary");
+
+StyleDictionary.registerTransform({
+  name: "size/px",
+  type: "value",
+  matcher: function (prop) {
+    return prop.attributes.category === "size";
+  },
+  transformer: function (prop) {
+    return parseFloat(prop.original.value) + "px";
+  },
+});
+
+module.exports = {
+  source: ["tokens/**/*.json"],
+  platforms: {
+    js: {
+      transforms: ["attribute/cti", "name/cti/constant"],
+      buildPath: "styles/",
+      files: [
+        {
+          destination: "tokens.js",
+          format: "javascript/es6",
+        },
+      ],
+    },
+    json: {
+      transforms: ["attribute/cti", "name/cti/kebab", "size/px", "color/css"],
+      buildPath: "styles/",
+      files: [
+        {
+          destination: "tokens.json",
+          format: "json/nested",
+        },
+      ],
+    },
+  },
+};
+```
+
+Run the Style Dictionary build command to generate the tokens.js and tokens.json files:
+
+```bash
+    npx style-dictionary build
+```
 
 ## Deploy on Vercel
 
