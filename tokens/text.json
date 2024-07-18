@@ -16,6 +16,18 @@
             },
             "body": {
                 "$value": "{dimensions.4}"
+            },
+            "small": {
+                "$value": "10px"
+            },
+            "medium": {
+                "$value": "16px"
+            },
+            "large": {
+                "$value": "24px"
+            },
+            "base": {
+                "$value": "{text.sizes.medium}"
             }
         },
         "weights": {
